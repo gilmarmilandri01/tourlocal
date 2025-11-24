@@ -5,8 +5,8 @@ import { Register } from "./pages/register";
 import { Location } from "./pages/location";
 import { Dashboard } from "./pages/dashboard";
 import { New } from "./pages/dashboard/new";
-import { Header } from "./components/header";
 import { Layout } from "./components/layout";
+import { Private } from "./routes/Private";
 
 const router = createBrowserRouter([
   {
@@ -21,11 +21,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <Dashboard />
+        element: <Private><Dashboard /></Private>
       },
       {
         path: "/New",
-        element: <New />
+        element: <Private><New /></Private>
       }
     ]
   },
