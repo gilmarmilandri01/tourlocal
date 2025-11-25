@@ -10,13 +10,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthContext } from '../../../contexts/AuthContext'
 import { v4 as uuidV4 } from 'uuid'
 
-import { storage } from '../../../services/firebaseConnection'
+import { storage, db } from '../../../services/firebaseConnection'
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject
 } from 'firebase/storage'
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
   nome: z.string().nonempty("O campo nome é obrigatório"),
@@ -44,7 +45,7 @@ export function New() {
     mode: "onChange"
   })
 
-  const [carImages, setCarImages] = useState<ImageItemProps[]>([])
+  const [localImages, setLocalImages] = useState<ImageItemProps[]>([])
 
   async function handleFile(e: ChangeEvent<HTMLInputElement>){
     if(e.target.files && e.target.files[0]){
@@ -56,7 +57,6 @@ export function New() {
         alert("Envie uma imagem jpeg ou png!")
         return;
       }
-
 
     }
   }
@@ -82,7 +82,7 @@ export function New() {
             url: downloadUrl,
           }
 
-          setCarImages((images) => [...images, imageItem] )
+          setLocalImages((images) => [...images, imageItem] )
 
 
         })
@@ -91,7 +91,40 @@ export function New() {
   }
 
   function onSubmit(data: FormData){
-    console.log(data);
+    if(localImages.length === 0){
+      alert("Envie alguma imagem do local")
+      return;
+    }
+
+    const localListImages = localImages.map( local => {
+      return{
+        uid: local.uid,
+        nome: local.name,
+        url: local.url
+      }
+    })
+
+    addDoc(collection(db, "locations"),{
+      nome: data.nome,
+      contato: data.contato,
+      horario: data.horario,
+      valor: data.valor,
+      bairro: data.bairro,
+      endereco: data.endereco,
+      descricao: data.descricao,
+      created: new Date(),
+      owner: user?.name,
+      uid: user?.uid,
+      images: localListImages,
+    })
+    .then(() => {
+      reset();
+      setLocalImages([]);
+      console.log("Cadastrado com sucesso")
+    })
+    .catch((error) => {
+      console.log(error)
+    })
   }
 
   async function handleDeleteImage(item: ImageItemProps){
@@ -101,12 +134,11 @@ export function New() {
 
     try{
       await deleteObject(imageRef)
-      setCarImages(carImages.filter((car) => car.url !== item.url))
+      setLocalImages(localImages.filter((local) => local.url !== item.url))
     }catch(err){
       console.log("ERRO AO DELETAR")
     }
   }
-
 
 
   return (
@@ -126,7 +158,7 @@ export function New() {
             />
           </div>
         </button>
-        {carImages.map( item => ( 
+        {localImages.map( item => ( 
           <div key={item.name} className="w-full h-32 flex items-center justify-center relative">
             <button className="absolute" onClick={ () => handleDeleteImage(item)}>
               <FiTrash size={28} color="#FFF" />
