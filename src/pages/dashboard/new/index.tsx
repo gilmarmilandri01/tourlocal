@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useContext } from "react";
+import { type ChangeEvent, useState, useContext } from "react";
 import { Container } from "../../../components/container";
 import { DashboardHeader } from "../../../components/panelheader";
 
