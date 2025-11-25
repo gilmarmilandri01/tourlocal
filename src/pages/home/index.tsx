@@ -2,7 +2,7 @@ import { Container } from "../../components/container"
 import { useState, useEffect } from "react"
 import { collection, query, getDocs, orderBy } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
-import { Link } from "react-router"
+import { Link } from "react-router-domn"
 
 interface LocationsProps{
   id: string;
@@ -11,6 +11,7 @@ interface LocationsProps{
   valor: string;
   bairro: string;
   images: LocalImageProps[];
+  uid: string;
 }
 
 interface LocalImageProps{
