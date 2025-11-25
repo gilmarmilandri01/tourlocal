@@ -2,7 +2,7 @@ import { Container } from "../../components/container"
 import { useState, useEffect } from "react"
 import { collection, query, getDocs, orderBy } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
-import { Link } from "react-router-domn"
+import { Link } from "react-router"
 
 interface LocationsProps{
   id: string;
